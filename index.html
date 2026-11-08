@@ -1399,10 +1399,8 @@ html,body{overflow-x:clip!important}
       <a href="#hero" data-page-target="home" onclick="navTo('home'); return false;">Home</a>
       <a href="#trending" data-page-target="trending" onclick="navToSectionOrPage('trending', 'home'); return false;">Trending</a>
       <a href="#events" data-page-target="events" onclick="navToSectionOrPage('events', 'events'); return false;">Events</a>
-      <a href="#colleges" data-page-target="college-profile" onclick="navToSectionOrPage('colleges', 'college-profile'); return false;">Colleges</a>
       <a href="#community" data-page-target="community" onclick="navToSectionOrPage('community', 'community'); return false;">Community</a>
       <a href="#services" data-page-target="services" onclick="navTo('services'); return false;">Student Tools</a>
-      <a href="#create-event" data-page-target="create-event" onclick="navTo('create-event'); return false;">Host Event</a>
     </div>
 
     <!-- Long Search Bar -->
@@ -7388,6 +7386,257 @@ function acForgot(){
   acUsers().some(x=>x.email===email)?acMsg("Demo: Your account exists. Password reset requires a backend email service.","info"):acMsg("No demo account found with this email address.");
 }
 function acGoogle(){acMsg("Google Sign-In needs OAuth configuration. Use email signup/login for this demo.","info")}
+</script>
+
+<!-- ===== Campverse add-on: DMs, discussion, reg windows, compare, gallery, ID verify, reports ===== -->
+<style id="cvx-style">
+.cvx-in,.cvx-sel,.cvx-ta{width:100%;background:#0E0F15;border:1px solid var(--line);color:#fff;border-radius:12px;padding:10px 12px;font:inherit;font-size:14px}
+.cvx-ta{min-height:84px;resize:vertical}
+.cvx-pill{padding:6px 13px;border-radius:99px;border:1px solid var(--line);font-size:12.5px;color:var(--mu);cursor:pointer;background:transparent}
+.cvx-pill.on{background:rgba(167,139,250,.18);color:#fff;border-color:var(--pu)}
+.cvx-v{display:inline-flex;gap:4px;align-items:center;font-size:11px;font-weight:700;color:#4ADE80;background:rgba(74,222,128,.12);padding:2px 8px;border-radius:99px;white-space:nowrap}
+.cvx-v.n{color:#FBBF24;background:rgba(251,191,36,.12)}
+.cvx-v.r{color:#F87171;background:rgba(248,113,113,.12)}
+.cvx-grid2{display:grid;grid-template-columns:340px 1fr;gap:18px;align-items:start}
+.cvx-box{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px}
+.cvx-av{width:40px;height:40px;border-radius:50%;background:linear-gradient(120deg,var(--pu),var(--bl));display:grid;place-items:center;font-weight:800;color:#111;flex:none}
+.cvx-row{display:flex;gap:12px;align-items:center;padding:10px;border-radius:14px;cursor:pointer}
+.cvx-row:hover,.cvx-row.on{background:rgba(167,139,250,.12)}
+.cvx-bub{max-width:78%;padding:9px 13px;border-radius:16px;font-size:14px;line-height:1.5;background:#1E2029}
+.cvx-bub.me{background:linear-gradient(120deg,var(--pu),var(--bl));color:#08090D;margin-left:auto}
+.cvx-gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.cvx-gal figure{margin:0;border-radius:16px;overflow:hidden;border:1px solid var(--line);cursor:zoom-in;background:#000}
+.cvx-gal img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover}
+.cvx-gal figcaption{padding:8px 12px;font-size:12px;color:var(--mu)}
+.cvx-tbl{width:100%;border-collapse:collapse;min-width:640px}
+.cvx-tbl th,.cvx-tbl td{padding:12px 14px;border-bottom:1px solid var(--line);text-align:left;font-size:14px;vertical-align:top}
+.cvx-tbl td.best{color:#4ADE80;font-weight:700}
+.cvx-ban{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:12px 16px;margin:0 0 18px;border-radius:16px;border:1px solid rgba(251,191,36,.4);background:rgba(251,191,36,.08);font-size:13.5px}
+.cvx-lb{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.88);display:none;place-items:center;padding:20px}
+.cvx-lb.on{display:grid}.cvx-lb img{max-width:100%;max-height:85vh;border-radius:14px}
+
+
+#cvxBar{position:fixed;left:0;right:0;z-index:40;display:none;flex-wrap:wrap;gap:6px;align-items:center;padding:8px max(14px,calc((100% - 1240px)/2));background:rgba(8,9,13,.97);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);scrollbar-width:none;-webkit-overflow-scrolling:touch}
+#cvxBar::-webkit-scrollbar{display:none}
+#cvxBar a{flex:0 1 auto;padding:6px 13px;border-radius:99px;border:1px solid var(--line);font-size:13px;color:var(--mu);transition:.2s}
+#cvxBar a:hover,#cvxBar a.on{color:#fff;border-color:var(--pu);background:rgba(167,139,250,.15)}
+.page-view:not(#page-home){padding-top:calc(76px + var(--cvx-bar,0px))!important}
+.cvx-map{display:block;width:100%;height:280px;border:0;border-radius:14px;background:#111}
+@media(max-width:560px){.cvx-map{height:230px}#cvxBar{gap:5px;padding-top:6px;padding-bottom:6px}#cvxBar a{padding:5px 10px;font-size:12px}}
+.cvx-strip{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:44px 0 10px;padding:16px;border:1px solid var(--line);border-radius:18px;background:var(--card)}
+.cvx-strip strong{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--mu);margin-right:6px}
+.cvx-strip a{padding:6px 13px;border-radius:99px;border:1px solid var(--line);font-size:13px;color:var(--mu);transition:.2s}
+.cvx-strip a:hover{color:#fff;border-color:var(--pu)}
+/* responsive layer */
+html,body{max-width:100%;overflow-x:hidden}
+.page-view{max-width:100vw;overflow-x:clip}
+.page-view img,.page-view video,.page-view canvas,.page-view iframe{max-width:100%}
+.page-view .container{width:min(1240px,100% - 28px);margin-inline:auto;min-width:0}
+.page-view *{min-width:0}
+.page-view table{max-width:100%}
+.page-view .tbl-scroll,.page-view [style*="overflow-x"]{overflow-x:auto}
+@media(max-width:900px){[data-cvg=n3]{grid-template-columns:repeat(2,minmax(0,1fr))!important}[data-cvg=s]{grid-template-columns:minmax(0,1fr)!important}footer [style*="grid-template-columns"]{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:560px){[data-cvg=n3]{grid-template-columns:minmax(0,1fr)!important}footer [style*="grid-template-columns"]{grid-template-columns:minmax(0,1fr)!important}.modal-card{width:calc(100vw - 24px)!important;max-width:none!important}.cvx-bub{max-width:90%}}
+@media(max-width:860px){.cvx-grid2{grid-template-columns:1fr}}
+</style>
+<div class="modal-overlay" id="cvReportModal" onclick="handleOverlayClick(event,'cvReportModal')"><div class="modal-card" style="max-width:460px">
+ <div class="modal-head"><h3 style="font-size:18px">🚩 Report</h3><button class="modal-close" onclick="closeModal('cvReportModal')">✕</button></div>
+ <p id="cvRepWho" style="color:var(--mu);font-size:13px;margin:6px 0 14px"></p>
+ <label style="font-size:12px;color:var(--mu)">Reason</label>
+ <select id="cvRepReason" class="cvx-sel" style="margin:6px 0 12px"><option>Fake Profile</option><option>Impersonation</option><option>Fake College / ID</option><option>Fake Event</option><option>Harassment</option><option>Spam</option><option>Other</option></select>
+ <label style="font-size:12px;color:var(--mu)">What happened? (optional)</label>
+ <textarea id="cvRepText" class="cvx-ta" style="margin:6px 0 14px" placeholder="e.g. Using someone else's photo, claims a college they don't attend…"></textarea>
+ <button class="btn primary" style="width:100%" onclick="cvSubmitReport()">Send report to admin</button>
+</div></div>
+<div class="cvx-lb" id="cvLb" onclick="this.classList.remove('on')"><img id="cvLbImg" alt=""></div>
+<script>
+(function(){
+const g=id=>document.getElementById(id),esc=s=>escapeHtml(String(s==null?'':s)),ld=getStore,sv=setStore;
+const fmt=d=>d.toLocaleDateString('en-IN',{day:'numeric',month:'short'}),tm=()=>new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+const myMail=()=>currentUser.email,vs=()=>ld('cv_verify',{})[myMail()]||null,isV=()=>vs()&&vs().status==='approved';
+const vb=ok=>ok?'<span class="cvx-v">✓ Verified student</span>':'<span class="cvx-v n">Unverified</span>';
+const needV=()=>{toast('Verify your college ID first 🛡️');navTo('verify')};
+window.cvNeedV=needV;
+
+/* ---------- DATA ---------- */
+const COL=[{id:'abc',name:'ABC Institute of Technology',loc:'Surat, Gujarat',hue:265},{id:'gnu',name:'Gujarat National University',loc:'Ahmedabad, Gujarat',hue:200},{id:'cdma',name:'Creative Design & Media Academy',loc:'Vadodara, Gujarat',hue:330},{id:'svim',name:'Surat Valley Institute of Management',loc:'Surat, Gujarat',hue:30},{id:'nec',name:'Narmada Engineering College',loc:'Bharuch, Gujarat',hue:150}];
+const CATS=[['campus','🏛️ Campus'],['lab','🔬 Labs'],['class','🎓 Classrooms'],['library','📚 Library'],['hostel','🛏️ Hostel'],['sports','⚽ Sports'],['canteen','🍜 Canteen']];
+const GOALS=['Hackathons','Startups','Design','Placements','Research','Sports','Music & Arts','Open Source'];
+const PEOPLE=[
+{id:'p1',name:'Riya Sharma',col:'ABC Institute of Technology',course:'UI/UX · 2nd Yr',goals:['Design','Startups','Hackathons']},
+{id:'p2',name:'Kabir Patel',col:'Gujarat National University',course:'Robotics · 3rd Yr',goals:['Hackathons','Research','Open Source']},
+{id:'p3',name:'Tanya Verma',col:'ABC Institute of Technology',course:'AI & DS · 4th Yr',goals:['Placements','Research']},
+{id:'p4',name:'Dev Joshi',col:'Surat Valley Institute of Management',course:'MBA · 1st Yr',goals:['Startups','Placements']},
+{id:'p5',name:'Meera Desai',col:'Creative Design & Media Academy',course:'B.Des · 3rd Yr',goals:['Design','Music & Arts']},
+{id:'p6',name:'Arjun Rao',col:'Narmada Engineering College',course:'Mechanical · 2nd Yr',goals:['Sports','Hackathons']},
+{id:'p7',name:'Sana Khan',col:'Gujarat National University',course:'B.Sc CS · 2nd Yr',goals:['Open Source','Hackathons','Startups']}];
+
+/* ---------- SCENES (generated gallery art; real photos can be uploaded) ---------- */
+function scene(cat,hue,n){
+ const a=`hsl(${hue},65%,26%)`,b=`hsl(${(hue+50)%360},70%,14%)`,c=`hsl(${hue},85%,72%)`,w='#ffffff';let s='';
+ const R=(x,y,W,H,f,o)=>`<rect x="${x}" y="${y}" width="${W}" height="${H}" fill="${f}"${o?` opacity="${o}"`:''}/>`;
+ if(cat==='campus'){s=`<circle cx="${620-n*90}" cy="80" r="36" fill="${c}" opacity=".85"/>`+R(0,380,800,120,a)+R(150,170,500,210,w,.92)+`<polygon points="130,170 400,70 670,170" fill="${c}"/>`+[0,1,2,3,4,5].map(i=>R(180+i*78,215,36,165,a)).join('')+R(370,300,60,80,b)}
+ else if(cat==='lab'){s=R(0,330,800,170,a)+[0,1,2].map(i=>R(70+i*240,230,190,12,w,.8)+R(110+i*240,150,110,80,b)+R(118+i*240,158,94,64,c,.7)+R(70+i*240,242,12,110,w,.6)+R(248+i*240,242,12,110,w,.6)).join('')}
+ else if(cat==='class'){s=R(120,60,560,150,b)+R(130,70,540,130,c,.25)+`<text x="400" y="150" font-size="38" fill="${w}" text-anchor="middle" opacity=".8" font-family="sans-serif">E = mc²</text>`+R(0,380,800,120,a)+[0,1,2].map(r=>[0,1,2,3].map(i=>R(120+i*150+(r%2)*30,260+r*38,100,16,w,.75)).join('')).join('')}
+ else if(cat==='library'){s=[0,1,2,3].map(i=>R(50+i*180,60,150,300,a)+[0,1,2,3,4].map(j=>R(58+i*180,80+j*58,134,38,[c,w,b][(i+j+n)%3],.55)).join('')).join('')+R(0,380,800,120,b)}
+ else if(cat==='hostel'){s=R(100,80,600,300,w,.9)+[0,1,2,3,4,5].map(i=>[0,1,2].map(j=>R(130+i*95,110+j*85,50,55,(i+j+n)%4?c:a,.75)).join('')).join('')+R(0,380,800,120,a)}
+ else if(cat==='sports'){s=R(0,0,800,500,'#1f7a3d')+`<g fill="none" stroke="${w}" stroke-width="5" opacity=".85"><rect x="70" y="70" width="660" height="360"/><line x1="400" y1="70" x2="400" y2="430"/><circle cx="400" cy="250" r="64"/></g>`+(n?`<ellipse cx="400" cy="250" rx="300" ry="150" fill="none" stroke="${w}" stroke-width="3" opacity=".6"/>`:'')}
+ else{s=R(0,360,800,140,a)+[0,1,2].map(i=>`<ellipse cx="${170+i*230}" cy="300" rx="90" ry="22" fill="${c}"/>`+R(163+i*230,300,14,70,w,.7)+`<circle cx="${130+i*230}" cy="262" r="14" fill="${w}" opacity=".85"/><circle cx="${210+i*230}" cy="262" r="14" fill="${w}" opacity=".85"/>`).join('')+`<text x="400" y="110" font-size="46" fill="${w}" text-anchor="middle" opacity=".8" font-family="sans-serif">☕ 🍜 🥪</text>`}
+ const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${b}"/><stop offset="1" stop-color="${a}"/></linearGradient></defs><rect width="800" height="500" fill="url(#g)"/>${s}</svg>`;
+ return 'data:image/svg+xml;utf8,'+encodeURIComponent(svg)}
+
+/* ---------- REPORT ---------- */
+let rep={};
+window.cvReport=(kind,name,reason)=>{rep={kind,name};g('cvRepWho').textContent='Reporting: '+name;g('cvRepReason').value=reason||'Fake Profile';g('cvRepText').value='';openModal('cvReportModal')};
+window.cvSubmitReport=()=>{const d=g('cvRepText').value.trim();
+ adminReports.push({id:Date.now(),content:(rep.kind==='profile'?'Profile: ':rep.kind==='event'?'Event/Organizer: ':'Post: ')+rep.name+' — '+(d||'no details'),reason:g('cvRepReason').value,by:currentUser.name||'Student',status:'Open'});
+ sv('ch_admin_reports',adminReports);if(typeof renderAdminReportsTable==='function')renderAdminReportsTable();
+ closeModal('cvReportModal');toast('Report sent to admin. Thanks for keeping Campverse safe 🛡️')};
+
+/* ---------- VERIFY ID ---------- */
+function shrink(file,max,cb){const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*k;c.height=im.height*k;c.getContext('2d').drawImage(im,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',.7))};im.src=r.result};r.readAsDataURL(file)}
+let idImg='';
+window.cvPickId=i=>{const f=i.files[0];if(!f)return;shrink(f,900,d=>{idImg=d;g('cvIdPrev').innerHTML='<img src="'+d+'" style="max-width:100%;max-height:180px;border-radius:12px;margin-top:10px">'})};
+window.cvSubmitVerify=()=>{const col=g('cvVCol').value,en=g('cvVEnr').value.trim(),nm=g('cvVName').value.trim();
+ if(!nm||!en||!idImg||!g('cvVOk').checked){toast('Fill every field, upload your ID and accept the declaration');return}
+ const m=ld('cv_verify',{});m[myMail()]={status:'pending',name:nm,email:myMail(),college:col,enroll:en,img:idImg,at:new Date().toISOString()};sv('cv_verify',m);
+ currentUser.college=col;sv('campushub_user',currentUser);toast('ID submitted. Admin will review it shortly ✅');renderVerify()};
+window.cvResetVerify=()=>{const m=ld('cv_verify',{});delete m[myMail()];sv('cv_verify',m);idImg='';renderVerify()};
+function renderVerify(){const r=g('cvVerifyRoot');if(!r)return;const v=vs();let top='';
+ if(v&&v.status==='approved')top=`<div class="cvx-box" style="border-color:#4ADE80"><h3>✓ You're a verified student</h3><p style="color:var(--mu);margin-top:6px">${esc(v.college)} · Enrollment ${esc(v.enroll)}. Your profile, messages and posts now show a verified badge.</p></div>`;
+ else if(v&&v.status==='pending')top=`<div class="cvx-box" style="border-color:#FBBF24"><h3>⏳ Under review</h3><p style="color:var(--mu);margin:6px 0 12px">Submitted for ${esc(v.college)}. An admin will check your ID card (Admin → ID Verification).</p><button class="btn small" onclick="cvResetVerify()">Withdraw & resubmit</button></div>`;
+ else{const rej=v&&v.status==='rejected';top=(rej?`<div class="cvx-ban" style="border-color:#F87171;background:rgba(248,113,113,.08)">❌ Your last submission was rejected${v.note?': '+esc(v.note):''}. Please resubmit a clear photo of your valid college ID.</div>`:'')+`<div class="cvx-box"><div style="display:grid;gap:12px">
+ <div><label style="font-size:12px;color:var(--mu)">Full name (as on ID)</label><input id="cvVName" class="cvx-in" value="${esc(currentUser.name||'')}"></div>
+ <div><label style="font-size:12px;color:var(--mu)">College</label><select id="cvVCol" class="cvx-sel">${COL.map(c=>`<option ${c.name===currentUser.college?'selected':''}>${esc(c.name)}</option>`).join('')}</select></div>
+ <div><label style="font-size:12px;color:var(--mu)">Enrollment / ID number</label><input id="cvVEnr" class="cvx-in" placeholder="e.g. 22CS104"></div>
+ <div><label style="font-size:12px;color:var(--mu)">Photo of your college ID card (front)</label><input type="file" accept="image/*" class="cvx-in" onchange="cvPickId(this)"><div id="cvIdPrev"></div></div>
+ <label style="font-size:13px;display:flex;gap:8px"><input type="checkbox" id="cvVOk"> I confirm this is my own valid ID. I understand fake IDs lead to a permanent ban.</label>
+ <button class="btn primary" onclick="cvSubmitVerify()">Submit for verification 🛡️</button></div></div>`}
+ setTimeout(syncVerifyUI,0);r.innerHTML=top+`<div class="cvx-box" style="margin-top:16px"><strong>Why verify?</strong><p style="color:var(--mu);font-size:13.5px;margin-top:6px">Verified badge builds trust · only verified students can send DMs and post in discussions · fake accounts get removed · ID images are only visible to admins.</p></div>`}
+window.cvIdQueue=()=>{const t=g('cvIdBody');if(!t)return;const m=Object.values(ld('cv_verify',{}));
+ t.innerHTML=m.length?m.map(v=>`<tr style="border-bottom:1px solid var(--line)"><td style="padding:10px"><strong>${esc(v.name)}</strong><br><small style="color:var(--mu)">${esc(v.email)}</small></td><td style="padding:10px">${esc(v.college)}<br><small style="color:var(--mu)">${esc(v.enroll)}</small></td><td style="padding:10px"><img src="${v.img}" style="height:54px;border-radius:8px;cursor:zoom-in" onclick="cvZoom(this.src)"></td><td style="padding:10px">${v.status==='approved'?'<span class="cvx-v">Approved</span>':v.status==='rejected'?'<span class="cvx-v r">Rejected</span>':'<span class="cvx-v n">Pending</span>'}</td><td style="padding:10px;text-align:right"><button class="btn small primary" onclick="cvDecide('${esc(v.email)}','approved')">Approve</button> <button class="btn small" onclick="cvDecide('${esc(v.email)}','rejected')">Reject</button></td></tr>`).join(''):'<tr><td colspan="5" style="padding:24px;color:var(--mu);text-align:center">No ID submissions yet.</td></tr>'};
+window.cvDecide=(em,s)=>{const m=ld('cv_verify',{});if(!m[em])return;m[em].status=s;if(s==='rejected')m[em].note='ID not clearly readable or details do not match';sv('cv_verify',m);cvIdQueue();syncVerifyUI();toast('ID '+s)};
+window.cvZoom=src=>{g('cvLbImg').src=src;g('cvLb').classList.add('on')};
+
+/* ---------- MESSAGES (DM) ---------- */
+let tab='chats',cur=null,pq='',pg='';
+const mine=()=>ld('cv_goals',['Hackathons','Startups']),thr=()=>ld('cv_dms',[]),P=id=>PEOPLE.find(p=>p.id===id);
+const shared=p=>p.goals.filter(x=>mine().includes(x));
+window.cvTab=t=>{tab=t;renderMessages()};
+window.cvGoal=x=>{let m=mine();m=m.includes(x)?m.filter(y=>y!==x):m.concat(x);sv('cv_goals',m);renderMessages()};
+window.cvOpen=id=>{const t=thr();if(!t.find(x=>x.id===id)){t.push({id,msgs:[]});sv('cv_dms',t)}cur=id;tab='chats';navTo('messages')};
+window.cvPQ=v=>{pq=v;drawPeople()};window.cvPG=v=>{pg=v;drawPeople()};
+function drawPeople(){const el=g('cvPeople');if(!el)return;
+ const l=PEOPLE.filter(p=>(p.name+p.col+p.goals.join()).toLowerCase().includes(pq.toLowerCase())&&(!pg||p.goals.includes(pg))).sort((a,b)=>shared(b).length-shared(a).length);
+ el.innerHTML=l.map(p=>{const s=shared(p);return `<div class="cvx-row" style="cursor:default"><div class="cvx-av">${p.name[0]}</div><div style="flex:1;min-width:0"><strong style="font-size:14px">${esc(p.name)}</strong> <span class="cvx-v">✓</span><div style="font-size:11.5px;color:var(--mu)">${esc(p.course)} · ${esc(p.col)}</div><div style="font-size:11.5px;color:${s.length?'#A78BFA':'var(--mu)'}">${s.length?'🎯 Same goal: '+esc(s.join(', ')):esc(p.goals.join(', '))}</div></div><button class="btn small primary" onclick="cvOpen('${p.id}')">Message</button></div>`}).join('')||'<p style="color:var(--mu);padding:10px">No one matches.</p>'}
+window.cvSend=()=>{const i=g('cvMsgIn'),x=i.value.trim();if(!x||!cur)return;if(!isV())return needV();
+ const t=thr(),th=t.find(a=>a.id===cur);if(th.blocked)return;th.msgs.push({me:1,x,t:tm()});sv('cv_dms',t);renderMessages();
+ const p=P(cur),s=shared(p),id=cur;setTimeout(()=>{const t2=thr(),h=t2.find(a=>a.id===id);h.msgs.push({me:0,x:`Hey! Good to connect 👋 I'm also into ${s[0]||p.goals[0]}. Want to team up or share notes?`,t:tm()});sv('cv_dms',t2);if(g('page-messages').classList.contains('active'))renderMessages()},1400)};
+window.cvBlock=()=>{const t=thr(),h=t.find(a=>a.id===cur);h.blocked=!h.blocked;sv('cv_dms',t);renderMessages();toast(h.blocked?'User blocked':'User unblocked')};
+function renderMessages(){const r=g('cvMsgRoot');if(!r)return;const t=thr(),m=mine();
+ const chats=t.length?t.map(h=>{const p=P(h.id),l=h.msgs[h.msgs.length-1];return `<div class="cvx-row ${cur===h.id?'on':''}" onclick="cvOpen('${h.id}')"><div class="cvx-av">${p.name[0]}</div><div style="min-width:0"><strong style="font-size:14px">${esc(p.name)}</strong><div style="font-size:12px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${l?esc(l.x):'Say hi 👋'}</div></div></div>`}).join(''):'<p style="color:var(--mu);padding:10px;font-size:13px">No chats yet. Open “Find people” and message anyone who shares your goal.</p>';
+ const left=`<div class="cvx-box"><div style="display:flex;gap:8px;margin-bottom:14px"><button class="cvx-pill ${tab==='chats'?'on':''}" onclick="cvTab('chats')">Chats</button><button class="cvx-pill ${tab==='people'?'on':''}" onclick="cvTab('people')">Find people</button></div>`+
+ (tab==='chats'?chats:`<div style="font-size:12px;color:var(--mu);margin-bottom:8px">My goals (we match you with similar students)</div><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">${GOALS.map(x=>`<button class="cvx-pill ${m.includes(x)?'on':''}" onclick="cvGoal('${x}')">${x}</button>`).join('')}</div><div style="display:flex;gap:8px;margin-bottom:10px"><input class="cvx-in" placeholder="Search name, college…" value="${esc(pq)}" oninput="cvPQ(this.value)"><select class="cvx-sel" style="width:120px" onchange="cvPG(this.value)"><option value="">All goals</option>${GOALS.map(x=>`<option ${pg===x?'selected':''}>${x}</option>`).join('')}</select></div><div id="cvPeople" style="max-height:52vh;overflow:auto"></div>`)+`</div>`;
+ let right;const h=t.find(a=>a.id===cur);
+ if(!h)right=`<div class="cvx-box" style="text-align:center;padding:60px 20px;color:var(--mu)"><div style="font-size:40px">💬</div><p style="margin-top:8px">Message any student directly, especially ones with the same goal as you.</p></div>`;
+ else{const p=P(h.id),s=shared(p);right=`<div class="cvx-box" style="display:flex;flex-direction:column;height:68vh"><div style="display:flex;gap:12px;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--line);flex-wrap:wrap"><div class="cvx-av">${p.name[0]}</div><div style="flex:1;min-width:140px"><strong>${esc(p.name)}</strong> <span class="cvx-v">✓ Verified</span><div style="font-size:12px;color:var(--mu)">${esc(p.course)} · ${esc(p.col)}${s.length?' · 🎯 '+esc(s.join(', ')):''}</div></div><button class="btn small" onclick="cvReport('profile','${esc(p.name)} (${esc(p.col)})')">🚩 Report fake</button><button class="btn small" onclick="cvBlock()">${h.blocked?'Unblock':'Block'}</button></div>
+ <div id="cvMsgArea" style="flex:1;overflow:auto;display:flex;flex-direction:column;gap:8px;padding:14px 0">${h.msgs.map(x=>`<div class="cvx-bub ${x.me?'me':''}">${esc(x.x)}<div style="font-size:10px;opacity:.6;margin-top:2px">${x.t}</div></div>`).join('')||'<p style="color:var(--mu);text-align:center;margin:auto">Start the conversation 👋</p>'}</div>
+ ${isV()?'':`<div class="cvx-ban" style="margin:0 0 10px">🛡️ Verify your college ID to send messages. <button class="btn small primary" onclick="navTo('verify')">Verify now</button></div>`}
+ <div style="display:flex;gap:8px"><input id="cvMsgIn" class="cvx-in" ${h.blocked?'disabled placeholder="You blocked this user"':'placeholder="Type a message…"'} onkeydown="if(event.key==='Enter')cvSend()"><button class="btn primary" onclick="cvSend()">Send</button></div><div style="font-size:11px;color:var(--mu);margin-top:6px">Demo mode: replies are simulated until a backend is connected.</div></div>`}
+ r.innerHTML=`<div class="cvx-grid2">${left}${right}</div>`;if(tab==='people')drawPeople();const a=g('cvMsgArea');if(a)a.scrollTop=a.scrollHeight}
+
+/* ---------- DISCUSSION GROUP (inside Community) ---------- */
+const CH=['All','General','Hackathons','Placements','Startups','Campus Life'];let dch='All',dopen=null;
+const disc=()=>ld('cv_disc',[{id:1,ch:'Hackathons',title:'Looking for a team for the 24-hour hackathon',body:'I do frontend + UI. Need a backend dev and an ML person. Same goal: win and learn!',by:'Riya Sharma',v:1,t:'2h ago',likes:6,re:[{by:'Kabir Patel',x:'I can do backend (Node). DM me!'}]},{id:2,ch:'Placements',title:'Best way to prepare for campus placements?',body:'Share resources, mock interview groups and resume tips.',by:'Tanya Verma',v:1,t:'5h ago',likes:11,re:[]},{id:3,ch:'Startups',title:'Open call: students building a startup together',body:'Any SME founders or students with the same goal? Let’s form a small community.',by:'Dev Joshi',v:1,t:'1d ago',likes:4,re:[]}]);
+window.cvCh=c=>{dch=c;drawDisc()};window.cvTog=id=>{dopen=dopen===id?null:id;drawDisc()};
+window.cvLike=id=>{const d=disc();d.find(x=>x.id===id).likes++;sv('cv_disc',d);drawDisc()};
+window.cvPost=()=>{if(!isV())return needV();const t=g('cvDT').value.trim(),b=g('cvDB').value.trim();if(!t)return toast('Add a topic title');const d=disc();d.unshift({id:Date.now(),ch:g('cvDC').value,title:t,body:b,by:currentUser.name,v:1,t:'just now',likes:0,re:[]});sv('cv_disc',d);g('cvDT').value=g('cvDB').value='';drawDisc()};
+window.cvReply=id=>{if(!isV())return needV();const i=g('cvR'+id),x=i.value.trim();if(!x)return;const d=disc();d.find(a=>a.id===id).re.push({by:currentUser.name,x});sv('cv_disc',d);drawDisc()};
+function drawDisc(){const el=g('cvDisc');if(!el)return;const l=disc().filter(x=>dch==='All'||x.ch===dch);
+ el.innerHTML=`<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center"><div><h3 style="font-size:20px">💬 Community Discussion Group</h3><p style="color:var(--mu);font-size:13px">Open topics for every student. Find people with the same goal and talk in public.</p></div><button class="btn small" onclick="navTo('messages')">✉ Direct messages</button></div>
+ <div style="display:flex;flex-wrap:wrap;gap:6px;margin:14px 0">${CH.map(c=>`<button class="cvx-pill ${dch===c?'on':''}" onclick="cvCh('${c}')">${c}</button>`).join('')}</div>
+ <div style="display:grid;gap:8px;margin-bottom:16px"><div style="display:flex;gap:8px;flex-wrap:wrap"><input id="cvDT" class="cvx-in" style="flex:1;min-width:200px" placeholder="Start a new topic…"><select id="cvDC" class="cvx-sel" style="width:150px">${CH.slice(1).map(c=>`<option>${c}</option>`).join('')}</select></div><textarea id="cvDB" class="cvx-ta" placeholder="Details (optional)"></textarea><button class="btn primary small" style="justify-self:start" onclick="cvPost()">Post topic</button></div>
+ ${l.map(d=>`<div style="border-top:1px solid var(--line);padding:14px 0"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="cvx-pill on" style="cursor:default">${esc(d.ch)}</span><strong style="cursor:pointer;flex:1;min-width:180px" onclick="cvTog(${d.id})">${esc(d.title)}</strong><small style="color:var(--mu)">${esc(d.by)} ${d.v?'<span class="cvx-v">✓</span>':''} · ${d.t}</small></div>
+ ${d.body?`<p style="color:var(--mu);font-size:13.5px;margin:8px 0">${esc(d.body)}</p>`:''}<div style="display:flex;gap:8px;margin-top:6px"><button class="btn small" onclick="cvLike(${d.id})">👍 ${d.likes}</button><button class="btn small" onclick="cvTog(${d.id})">💬 ${d.re.length}</button><button class="btn small" onclick="cvReport('post','${esc(d.title).replace(/'/g,'')} by ${esc(d.by)}')">🚩</button></div>
+ ${dopen===d.id?`<div style="margin-top:10px;padding-left:14px;border-left:2px solid var(--line)">${d.re.map(r=>`<p style="font-size:13.5px;margin-bottom:6px"><strong>${esc(r.by)}:</strong> ${esc(r.x)}</p>`).join('')}<div style="display:flex;gap:8px"><input id="cvR${d.id}" class="cvx-in" placeholder="Reply…" onkeydown="if(event.key==='Enter')cvReply(${d.id})"><button class="btn small primary" onclick="cvReply(${d.id})">Reply</button></div></div>`:''}</div>`).join('')||'<p style="color:var(--mu)">No topics here yet. Start one!</p>'}`}
+function mountDisc(){const c=document.querySelector('#page-community .container');if(!c)return;let b=g('cvDisc');if(!b){b=document.createElement('section');b.id='cvDisc';b.className='cvx-box';b.style.cssText='margin:0 0 24px;padding:22px';const bc=c.querySelector('.breadcrumb');bc?bc.after(b):c.prepend(b)}drawDisc()}
+
+/* ---------- COLLEGE GALLERY + COMPARE ---------- */
+let gc='abc',gcat='campus';const photos=()=>ld('cv_photos',{});
+window.cvGC=v=>{gc=v;drawGallery()};window.cvGCat=v=>{gcat=v;drawGallery()};
+window.cvUp=i=>{const f=[...i.files];f.forEach(file=>shrink(file,900,d=>{const p=photos();(p[gc]=p[gc]||[]).push({cat:gcat,src:d,cap:''});sv('cv_photos',p);drawGallery()}))};
+window.cvDelPhoto=k=>{const p=photos();(p[gc]||[]).splice(k,1);sv('cv_photos',p);drawGallery()};
+function drawGallery(){const el=g('cvGallery');if(!el)return;const c=COL.find(x=>x.id===gc),up=(photos()[gc]||[]).map((p,k)=>({...p,k})).filter(p=>p.cat===gcat);
+ el.innerHTML=`<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:12px"><div><h3 style="font-size:20px">📸 Campus Gallery</h3></div><div style="display:flex;gap:8px"><select class="cvx-sel" style="width:auto" onchange="cvGC(this.value)">${COL.map(x=>`<option value="${x.id}" ${x.id===gc?'selected':''}>${esc(x.name)}</option>`).join('')}</select></div></div>
+ <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">${CATS.map(([k,n])=>`<button class="cvx-pill ${gcat===k?'on':''}" onclick="cvGCat('${k}')">${n}</button>`).join('')}</div>
+ <div class="cvx-gal">${up.map(p=>`<figure style="position:relative" onclick="cvZoom('${p.src}')"><img src="${p.src}" alt="Campus photo"><button aria-label="Remove photo" onclick="event.stopPropagation();cvDelPhoto(${p.k})" style="position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,.65);color:#fff">✕</button></figure>`).join('')}${[0,1,2].map(n=>{const s=scene(gcat,c.hue,n);return `<figure onclick="cvZoom('${s.replace(/'/g,'%27')}')"><img src="${s}" alt="Campus photo"></figure>`}).join('')}</div>
+ <div style="margin:18px 0 8px"><strong>📍 Campus location</strong> <span style="color:var(--mu);font-size:13px">${esc(c.loc)}</span></div>${mapHTML(encodeURIComponent(c.name+', '+c.loc+', India'))}<div style="margin-top:14px"><label class="btn small" style="cursor:pointer">＋ Add real photos to ${CATS.find(a=>a[0]===gcat)[1]}<input type="file" accept="image/*" multiple hidden onchange="cvUp(this)"></label></div>`}
+function mountGallery(){const c=document.querySelector('#page-college-profile .container');if(!c)return;let b=g('cvGallery');if(!b){b=document.createElement('section');b.id='cvGallery';b.className='cvx-box';b.style.cssText='margin:0 0 28px;padding:22px';const rib=[...c.children].find(e=>(e.getAttribute('style')||'').includes('repeat(4'));rib?rib.after(b):c.appendChild(b)}drawGallery()}
+
+/* ---------- EVENT LOCATION + MAP ---------- */
+const campusOf=e=>e.campus||'ABC Institute of Technology',cityOf=e=>/gujarat|india/i.test(e.city||'')?e.city:(e.city||'Surat')+', Gujarat, India';
+const mq=e=>encodeURIComponent([e.address,e.venue,campusOf(e),cityOf(e)].filter(Boolean).join(', '));
+const mapHTML=(q,open)=>`<iframe class="cvx-map" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Location map" src="https://www.google.com/maps?q=${q}&output=embed"></iframe><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><a class="btn small primary" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${q}">Open in Google Maps ↗</a><a class="btn small" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${q}">🧭 Get directions</a></div>`;
+window.cvMap=id=>{navTo('event-details',{eventId:id});setTimeout(()=>{const b=g('cvLoc');b&&b.scrollIntoView({behavior:'smooth',block:'center'})},350)};
+function decorLoc(e){const h=g('detailVenueFull');if(!h)return;const card=h.closest('.hover-card');if(!card)return;let b=g('cvLoc');if(!b){b=document.createElement('div');b.id='cvLoc';b.style.marginTop='14px';card.appendChild(b)}
+ const old=card.querySelector('button[onclick*="openMapsPlaceholder"]');if(old)old.style.display='none';
+ b.innerHTML=`<div style="display:grid;gap:6px;margin-bottom:12px;font-size:13px"><div>🏛️ <strong>Campus:</strong> ${esc(campusOf(e))}</div><div>🏢 <strong>Venue:</strong> ${esc(e.venue||'To be announced')}</div>${e.address?`<div>📮 ${esc(e.address)}</div>`:''}<div>🌆 ${esc(e.city||'')}</div></div>`+(e.format==='Online'?'<p style="color:var(--mu);font-size:13px">🌐 Online event. The join link is shared after registration.</p>':(e.format==='Hybrid'?'<p style="color:var(--mu);font-size:12.5px;margin-bottom:8px">Hybrid event: attend on campus or join online.</p>':'')+mapHTML(mq(e)))}
+/* ---------- REGISTRATION WINDOW ---------- */
+function regWin(e){const dl=e.deadline?new Date(e.deadline):new Date(e.date+'T23:59'),st=e.regStart?new Date(e.regStart):new Date(dl.getTime()-14*864e5),n=new Date();return{st,dl,s:n<st?'soon':n>dl?'closed':'open',days:Math.ceil((dl-n)/864e5),sd:Math.ceil((st-n)/864e5)}}
+const wTxt=w=>w.s==='open'?`🟢 Registration open · closes ${fmt(w.dl)} (${w.days<=1?'last day':w.days+' days left'})`:w.s==='soon'?`🟡 Registration opens ${fmt(w.st)} (in ${w.sd} day${w.sd>1?'s':''})`:`🔴 Registration closed on ${fmt(w.dl)}`;
+const _card=createEventCardHTML;createEventCardHTML=function(e){const h0=_card(e),w=regWin(e),vsx=escapeHtml(e.venue || e.city),h=h0.replace(`<span>${vsx}</span></div>`,()=>`<span>${vsx}</span></div><div style="display:flex; align-items:center; gap:8px;"><span>🏛️</span><span>${esc(campusOf(e))}</span><a href="#" style="color:var(--pu);margin-left:auto;font-size:11.5px" onclick="event.stopPropagation();cvMap('${e.id}');return false">🗺 Map</a></div>`);return h.replace('<div style="display:flex; gap:8px; margin-top:auto;">',`<div style="font-size:11.5px;margin:-8px 0 12px;color:${w.s==='open'?'#4ADE80':w.s==='soon'?'#FBBF24':'#F87171'}">${wTxt(w)}</div><div style="display:flex; gap:8px; margin-top:auto;">`)};
+const _ro=openRegisterModal;openRegisterModal=function(id){const e=events.find(x=>x.id===id)||events[0],w=regWin(e);if(w.s==='soon')return toast('Registration opens on '+fmt(w.st));if(w.s==='closed')return toast('Registration closed on '+fmt(w.dl));return _ro(id)};
+const _det=renderEventDetailsView;renderEventDetailsView=function(id){_det(id);try{const e=events.find(x=>x.id===id)||events[0],w=regWin(e),a=g('detailDeadlineDisplay').parentElement;let b=g('cvRegWin');if(!b){b=document.createElement('div');b.id='cvRegWin';b.style.cssText='margin:12px 0;padding:12px 14px;border:1px solid var(--line);border-radius:14px;font-size:13px';a.after(b)}
+ b.innerHTML=`<strong>Registration window</strong><div style="margin:6px 0;color:var(--mu)">${fmt(w.st)} → ${fmt(w.dl)}</div><div>${wTxt(w)}</div><a href="#" style="color:#F87171;font-size:12px;display:inline-block;margin-top:8px" onclick="cvReport('event','${esc(e.title).replace(/'/g,'')} · ${esc(e.organizer||'')}','Fake Event');return false">🚩 Report fake event / organizer</a>`;
+ const btn=g('detailRegisterBtn');btn.disabled=w.s!=='open';btn.style.opacity=w.s==='open'?'':'.55';btn.textContent=w.s==='open'?'Register Now 🎟️':w.s==='soon'?'Opens '+fmt(w.st):'Registration closed';decorLoc(e)}catch(x){}};
+const _sub=handleUnifiedEventSubmit;handleUnifiedEventSubmit=function(ev){const rs=g('cvRegStart')&&g('cvRegStart').value,dl=g('createEventDeadline').value,t=g('createEventName').value.trim();
+ if(rs&&dl&&rs>=dl){ev.preventDefault();return toast('Registration start must be before the end date')}
+ const cp=g('cvCampus')&&g('cvCampus').value,ad=g('cvAddr')&&g('cvAddr').value.trim();_sub(ev);setTimeout(()=>{const e=events.slice().reverse().find(x=>x.title===t);if(e){if(rs)e.regStart=rs;if(cp)e.campus=cp;if(ad)e.address=ad;sv('campushub_events',events)}},0)};
+
+/* ---------- WRAPS, PAGES, NAV ---------- */
+['messages','verify'].forEach(p=>validPages.push(p));
+const hd=(t,s)=>`<div class="breadcrumb"><a href="#home" onclick="navTo('home')">Home</a> / <span style="color:var(--purple)">${t}</span></div><h2 style="font-size:clamp(1.8rem,4vw,2.6rem);margin:8px 0 6px">${t}</h2><p class="sub" style="margin:0 0 22px">${s}</p>`;
+(g('page-services')||document.body.lastElementChild).insertAdjacentHTML('afterend',`<main class="page-view" id="page-messages"><div class="container">${hd('Messages','Direct message any verified student, especially people who share your goals.')}<div id="cvMsgRoot"></div></div></main><main class="page-view" id="page-verify"><div class="container" style="max-width:720px">${hd('Verify College ID','Confirm you are a real student. Fake profiles are removed.')}<div id="cvVerifyRoot"></div></div></main>`);
+const _rm=renderMemberDirectory;renderMemberDirectory=function(){_rm();document.querySelectorAll('#memberDirectoryGrid button').forEach(b=>{const m=(b.getAttribute('onclick')||'').match(/with (.+?)\.\.\./);if(!m)return;const n=m[1],p=PEOPLE.find(x=>x.name===n);b.outerHTML=`<div style="display:flex;gap:6px"><button class="btn small primary" style="flex:1" onclick="cvOpen('${p?p.id:'p1'}')">Message ✉</button><button class="btn small" title="Report fake profile" onclick="cvReport('profile','${n}')">🚩</button></div>`})};
+const _rc=renderCommunityFeed;renderCommunityFeed=function(){_rc();mountDisc()};
+const _cp=renderCollegeProfileView;renderCollegeProfileView=function(){_cp();mountGallery()};
+const _nav=navTo;navTo=function(p,q){_nav(p,q);
+ if(p==='messages')renderMessages();if(p==='verify')renderVerify();
+ document.querySelectorAll('#cvBan').forEach(x=>x.remove());
+ if(['events','community','student-dashboard','college-profile'].includes(p)&&!isV()){const c=document.querySelector('#page-'+p+' .container');if(c){const b=document.createElement('div');b.id='cvBan';b.className='cvx-ban';b.innerHTML='🛡️ <span style="flex:1">'+(vs()&&vs().status==='pending'?'Your college ID is under review.':'Verify your college ID to message students, post in discussions and get a verified badge.')+'</span><button class="btn small primary" onclick="navTo(\'verify\')">'+(vs()&&vs().status==='pending'?'View status':'Verify now')+'</button>';c.prepend(b)}}};
+const lk=g('links');if(lk){const host=lk.querySelector('[data-page-target="create-event"]');[['messages','✉ Messages']].forEach(([p,t])=>{const a=document.createElement('a');a.href='#'+p;a.dataset.pageTarget=p;a.textContent=t;a.onclick=e=>{e.preventDefault();navTo(p)};host?host.before(a):lk.appendChild(a)})}
+
+
+/* ---------- VERIFY lives in the profile (dropdown + dashboard card) ---------- */
+function syncVerifyUI(){const v=vs(),st=v?v.status:'none',ok=st==='approved',lbl=ok?'✓ Verified':st==='pending'?'⏳ Under review':'Verify now';
+ const m=g('navProfileMenu');if(m){let a=g('cvMenuVerify');if(!a){a=document.createElement('a');a.id='cvMenuVerify';a.href='#verify';a.className='nav-profile-link';a.onclick=e=>{e.preventDefault();if(typeof closeProfileMenu==='function')closeProfileMenu();navTo('verify')};const d=m.querySelector('.nav-profile-divider');d?d.after(a):m.prepend(a)}
+  a.innerHTML='<span>🛡️</span><span>Verify College ID</span><span class="cvx-v'+(ok?'':' n')+'" style="margin-left:auto">'+lbl+'</span>'}
+ const nm=g('profileCardName');if(nm){let w=g('cvCardV');if(!w){const bd=nm.parentElement.querySelector('.badge');w=document.createElement('div');w.id='cvCardV';bd?bd.replaceWith(w):nm.parentElement.appendChild(w)}
+  w.innerHTML=(ok?'<span class="cvx-v">✓ Verified Student</span>':st==='pending'?'<span class="cvx-v n">⏳ ID under review</span>':'<span class="cvx-v n">Not verified</span>')+(ok?'':'<div style="margin-top:12px"><button class="btn small primary" onclick="navTo(\'verify\')">🛡 Verify college ID</button></div>')}}
+window.cvSync=syncVerifyUI;
+/* ---------- SITE-WIDE LINKS + RESPONSIVE HELPERS ---------- */
+const SITE=[['college-profile','🏛 Colleges'],['find-team','🤝 Find a Team'],['create-event','➕ Host an Event'],['student-dashboard','📊 Dashboard'],['notifications','🔔 Notifications']];
+function placeBar(){const b=g('cvxBar'),w=document.querySelector('nav .wrap');if(!b||b.style.display==='none'||!w)return;b.style.top=(w.getBoundingClientRect().bottom+14)+'px';document.documentElement.style.setProperty('--cvx-bar',b.offsetHeight+'px')}
+function mountStrip(p){document.querySelectorAll('.cvx-strip').forEach(x=>x.remove());let b=g('cvxBar');const pg=g('page-'+p);
+ if(p==='home'||!pg||pg.querySelector('.svc-frame')){if(b)b.style.display='none';document.documentElement.style.setProperty('--cvx-bar','0px');return}
+ if(!b){b=document.createElement('div');b.id='cvxBar';b.setAttribute('role','navigation');b.setAttribute('aria-label','Explore Campverse');document.body.appendChild(b)}
+ b.innerHTML=SITE.map(([k,t])=>`<a href="#${k}" class="${k===p?'on':''}" onclick="navTo('${k}');return false">${t}</a>`).join('');b.style.display='flex';b.scrollLeft=0;placeBar()}
+addEventListener('resize',placeBar);if(window.ResizeObserver){const ro=new ResizeObserver(placeBar);const t=setInterval(()=>{const b=g('cvxBar');if(b){ro.observe(b);ro.observe(document.querySelector('nav .wrap'));clearInterval(t)}},300)}
+const _nav2=navTo;navTo=function(p,q){_nav2(p,q);try{mountStrip(p);tagGrids();syncVerifyUI()}catch(e){}};
+function tagGrids(){document.querySelectorAll('[style*="grid-template-columns"]').forEach(el=>{if(el.dataset.cvg)return;const v=el.style.gridTemplateColumns||'';if(/auto-(fill|fit)/.test(v)){el.dataset.cvg='a';return}
+ const r=v.match(/repeat\((\d+)/),n=r?+r[1]:v.trim().split(/\s+(?![^()]*\))/).length;el.dataset.cvg=n>=3?'n3':n===2?'s':'a'})}
+let raf;new MutationObserver(()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(tagGrids)}).observe(document.body,{childList:true,subtree:true});tagGrids();
+const fa=document.querySelector('footer a[onclick*="find-team"]');if(fa)[['messages','Messages ✉'],['verify','Verify College ID']].forEach(([k,t])=>{const a=fa.cloneNode(true);a.textContent=t;a.setAttribute('href','#'+k);a.setAttribute('onclick',`navTo('${k}');return false`);fa.parentElement.appendChild(a)});
+const dh=[...document.querySelectorAll('#page-home footer h4')].find(h=>h.textContent.trim()==='Discover');if(dh)[['messages','Messages'],['verify','Verify ID'],['create-event','Host an Event'],['services','Student Tools']].forEach(([k,t])=>{const a=document.createElement('a');a.href='#'+k;a.textContent=t;a.onclick=e=>{e.preventDefault();navTo(k)};dh.parentElement.appendChild(a)});
+/* create-event: registration start field */
+syncVerifyUI();
+const dl=g('createEventDeadline');if(dl){const w=dl.parentElement,c=w.cloneNode(true),i=c.querySelector('input'),l=c.querySelector('label');i.id='cvRegStart';i.removeAttribute('required');i.removeAttribute('onchange');i.value='';if(l){l.textContent='Registration opens (start date)';l.removeAttribute('for')}const l2=w.querySelector('label');if(l2)l2.textContent='Registration closes (end date)';w.before(c)}
+const cty=g('createEventCity');if(cty){const w=cty.parentElement,mk=(lb,h)=>{const c=w.cloneNode(true),l=c.querySelector('label');if(l){l.textContent=lb;l.removeAttribute('for')}c.querySelector('input').outerHTML=h;return c};
+ const c1=mk('Campus / College (where it is organised)','<select id="cvCampus" class="cvx-sel">'+COL.map(c=>'<option>'+esc(c.name)+'</option>').join('')+'<option>Other campus</option></select>'),c2=mk('Full address / landmark (used for the map)','<input id="cvAddr" placeholder="e.g. Near Science Block, Ring Road, Surat 395007">');w.after(c1);c1.after(c2)}
+/* admin: ID verification tab + report-fake shortcut */
+const rb=document.querySelector('[data-admin-tab="admin-reports"]');if(rb){const nb=rb.cloneNode(true);nb.dataset.adminTab='admin-idv';nb.setAttribute('onclick',"showAdminTab('admin-idv',this);cvIdQueue()");nb.innerHTML='<span>🪪</span><span>ID Verification</span>';rb.after(nb);
+ const pane=document.createElement('section');pane.className='admin-tab-pane';pane.id='admin-idv';pane.style.display='none';pane.innerHTML='<h3 style="font-size:20px;margin-bottom:4px">ID Verification Queue</h3><p style="color:var(--muted);font-size:13px;margin-bottom:16px">Check the ID photo against name, college and enrollment number. Fake-profile reports are in the Reports tab.</p><div class="hover-card" style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:620px;font-size:14px"><thead><tr style="text-align:left;color:var(--muted);font-size:12px"><th style="padding:10px">Student</th><th style="padding:10px">College / ID no.</th><th style="padding:10px">ID photo</th><th style="padding:10px">Status</th><th style="padding:10px"></th></tr></thead><tbody id="cvIdBody"></tbody></table></div>';const rp=g('admin-reports');rp.parentElement.appendChild(pane)}
+})();
 </script>
 
 </body>
