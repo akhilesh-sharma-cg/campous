@@ -7157,8 +7157,9 @@ function updateGlobalUserPill() {
 
 // ------------------------------------------------------------
 // Initial Application Boot
-// ------------------------------------------------------------window.addEventListener("DOMContentLoaded", async () => {
+// ------------------------------------------------------------
 
+window.addEventListener("DOMContentLoaded", async () => {
   // Restore the Supabase login session
   const { data: { session } } =
     await campusHubSupabase.auth.getSession();
