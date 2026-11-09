@@ -7489,18 +7489,22 @@ async function acLogin(e){
   });
 }
 
-
-async function acSignup(e){
+async function acSignup(e) {
   e.preventDefault();
 
-  const name = document.getElementById("signupName")?.value.trim() || "";
-  const email = document.getElementById("signupEmail")?.value.trim().toLowerCase() || "";
-  const password = document.getElementById("signupPassword")?.value || "";
-  const college = document.getElementById("signupCollege")?.value.trim() || "";
-  const course = document.getElementById("signupCourse")?.value.trim() || "";
+  const name = document.getElementById("fullName").value.trim();
+  const email = document.getElementById("signupEmail").value.trim().toLowerCase();
+  const password = document.getElementById("signupPassword").value;
+  const confirmPassword = document.getElementById("confirmPassword").value;
+  const role = document.getElementById("accountType").value;
 
-  if(!name || !email || !password){
-    acMsg("Please fill in your name, email and password.");
+  if (!name || !email || !password) {
+    acMsg("Please fill in all required fields.");
+    return;
+  }
+
+  if (password !== confirmPassword) {
+    acMsg("Passwords do not match.");
     return;
   }
 
@@ -7512,29 +7516,29 @@ async function acSignup(e){
     options: {
       data: {
         full_name: name,
-        college_name: college,
-        course: course,
-        role: "student"
+        college_name: "",
+        course: "",
+        role: role
       }
     }
   });
 
-  if(error){
+  if (error) {
     acMsg(error.message);
     return;
   }
 
-  if(data.session && data.user){
+  if (data.session && data.user) {
     const { error: profileError } = await campusHubSupabase
       .from("profiles")
       .upsert({
         id: data.user.id,
         full_name: name,
-        college_name: college,
-        course: course
+        college_name: "",
+        course: ""
       });
 
-    if(profileError){
+    if (profileError) {
       acMsg("Profile saving failed: " + profileError.message);
       return;
     }
@@ -7545,7 +7549,7 @@ async function acSignup(e){
       id: data.user.id,
       name: name,
       email: email,
-      role: "student"
+      role: role
     });
 
   } else {
