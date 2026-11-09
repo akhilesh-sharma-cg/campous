@@ -1381,6 +1381,17 @@ html,body{overflow-x:clip!important}
   #trending2 .tg-card:active{transform:scale(.98)}
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = "https://nwgeqctnqzznnlwqmobi.supabase.co";
+
+const SUPABASE_KEY = "sb_publishable_GwNtgPH1t-yp8Ta_7X5m-g_XKmTNRN3";
+
+const campusHubSupabase = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+</script>
 </head>
 <body class="on-home">
 <div id="glow" aria-hidden="true"></div>
@@ -1466,7 +1477,7 @@ html,body{overflow-x:clip!important}
 
           <div class="nav-profile-divider"></div>
 
-          <a onclick="handleSignOut(); closeProfileMenu();" class="nav-profile-link" style="color:#f87171;">
+          <a onclick="acLogout(); closeProfileMenu();" class="nav-profile-link" style="color:#f87171;">
             <span>🚪</span>
             <span>Sign Out</span>
           </a>
@@ -7146,12 +7157,52 @@ function updateGlobalUserPill() {
 
 // ------------------------------------------------------------
 // Initial Application Boot
-// ------------------------------------------------------------
-window.addEventListener("DOMContentLoaded", () => {
+// ------------------------------------------------------------window.addEventListener("DOMContentLoaded", async () => {
+
+  // Restore the Supabase login session
+  const { data: { session } } =
+    await campusHubSupabase.auth.getSession();
+
+  if (session && session.user) {
+
+    const user = session.user;
+
+    const { data: profile } = await campusHubSupabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    currentUser = {
+      ...currentUser,
+      id: user.id,
+      name: profile?.full_name || user.user_metadata?.full_name || user.email,
+      email: user.email,
+      role: user.user_metadata?.role || "student",
+      college: profile?.college_name || "",
+      course: profile?.course || ""
+    };
+
+    localStorage.setItem("ch_auth_session", JSON.stringify({
+      id: user.id,
+      name: currentUser.name,
+      email: user.email,
+      role: currentUser.role
+    }));
+
+    localStorage.setItem("ch_student_profile", JSON.stringify({
+      name: currentUser.name,
+      email: user.email,
+      role: currentUser.role
+    }));
+  }
+
   const hash = window.location.hash.replace("#", "") || "home";
+
   navTo(hash);
   updateLivePreview();
   renderNotificationsView();
+
 });
 
 window.addEventListener("hashchange", () => {
@@ -7361,25 +7412,146 @@ function acFinish(user){
   acMsg("Welcome, "+user.name.split(" ")[0]+"! Taking you to the home page\u2026","success");
   setTimeout(()=>{navTo("home");toast("Signed in as "+user.name,"success")},800);
 }
-function acLogin(e){
-  e.preventDefault();
-  const email=acEl("loginEmail").value.trim().toLowerCase(),pw=acEl("loginPassword").value;
-  const u=acUsers().find(x=>x.email===email&&x.password===pw);
-  if(!u){acMsg("Invalid email or password. Please check your details or create an account.");return}
-  acFinish(u);
+async function acLogout(){
+  const { error } = await campusHubSupabase.auth.signOut();
+
+  if(error){
+    acMsg(error.message);
+    return;
+  }
+
+  localStorage.removeItem(AC_SESSION);
+  localStorage.removeItem("ch_student_profile");
+
+  toast("You have been signed out.", "success");
+  navTo("home");
 }
-function acSignup(e){
+
+async function acLogin(e){
   e.preventDefault();
-  const name=acEl("fullName").value.trim(),email=acEl("signupEmail").value.trim().toLowerCase(),role=acEl("accountType").value;
-  const pw=acEl("signupPassword").value,cf=acEl("confirmPassword").value;
-  if(pw.length<8){acMsg("Password must contain at least 8 characters.");return}
-  if(pw!==cf){acMsg("Passwords do not match. Please try again.");return}
-  const users=acUsers();
-  if(users.some(x=>x.email===email)){acMsg("An account with this email already exists. Please login.");return}
-  const u={id:"user_"+Date.now(),name,email,role,password:pw,createdAt:new Date().toISOString()};
-  users.push(u);localStorage.setItem(AC_USERS,JSON.stringify(users));
-  acFinish(u);
+
+  const email = acEl("loginEmail").value.trim().toLowerCase();
+  const password = acEl("loginPassword").value;
+
+  acMsg("Signing in...");
+
+  const { data, error } = await campusHubSupabase.auth.signInWithPassword({
+    email: email,
+    password: password
+  });
+
+  if(error){
+    acMsg(error.message);
+    return;
+  }
+
+  const user = data.user;
+
+  const { data: profile, error: profileError } = await campusHubSupabase
+    .from("profiles")
+    .select("*")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if(profileError){
+    acMsg("Could not load your profile: " + profileError.message);
+    return;
+  }
+
+  let studentProfile = profile;
+
+  if(!studentProfile){
+    const { data: newProfile, error: insertError } = await campusHubSupabase
+      .from("profiles")
+      .insert({
+        id: user.id,
+        full_name: user.user_metadata?.full_name || email,
+        college_name: user.user_metadata?.college_name || "",
+        course: user.user_metadata?.course || ""
+      })
+      .select()
+      .single();
+
+    if(insertError){
+      acMsg("Profile creation failed: " + insertError.message);
+      return;
+    }
+
+    studentProfile = newProfile;
+  }
+
+  acFinish({
+    id: user.id,
+    name: studentProfile.full_name || email,
+    email: user.email,
+    role: user.user_metadata?.role || "student"
+  });
 }
+
+
+async function acSignup(e){
+  e.preventDefault();
+
+  const name = document.getElementById("signupName")?.value.trim() || "";
+  const email = document.getElementById("signupEmail")?.value.trim().toLowerCase() || "";
+  const password = document.getElementById("signupPassword")?.value || "";
+  const college = document.getElementById("signupCollege")?.value.trim() || "";
+  const course = document.getElementById("signupCourse")?.value.trim() || "";
+
+  if(!name || !email || !password){
+    acMsg("Please fill in your name, email and password.");
+    return;
+  }
+
+  acMsg("Creating your account...");
+
+  const { data, error } = await campusHubSupabase.auth.signUp({
+    email: email,
+    password: password,
+    options: {
+      data: {
+        full_name: name,
+        college_name: college,
+        course: course,
+        role: "student"
+      }
+    }
+  });
+
+  if(error){
+    acMsg(error.message);
+    return;
+  }
+
+  if(data.session && data.user){
+    const { error: profileError } = await campusHubSupabase
+      .from("profiles")
+      .upsert({
+        id: data.user.id,
+        full_name: name,
+        college_name: college,
+        course: course
+      });
+
+    if(profileError){
+      acMsg("Profile saving failed: " + profileError.message);
+      return;
+    }
+
+    acMsg("Account created successfully!");
+
+    acFinish({
+      id: data.user.id,
+      name: name,
+      email: email,
+      role: "student"
+    });
+
+  } else {
+    acMsg("Account created! Please confirm your email, then log in.");
+  }
+}
+
 function acForgot(){
   const email=acEl("loginEmail").value.trim().toLowerCase();
   if(!email){acMsg("Enter your email address first, then click Forgot password.");acEl("loginEmail").focus();return}
